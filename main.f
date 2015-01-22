@@ -19,6 +19,13 @@ c     variables
 c     functions
       double precision integrate
 
+c     machine pi
+      pi = dacos(dble(-1.))
+
+c     number of intervals
+      n = 8000
+
+c     get information about processes
       rank = myprocid()
       p = nprocs()
 
@@ -33,12 +40,6 @@ c     create star topology
           link1 = addnewlink(topid, 0, 1)
         endif
       endif
-
-c     number of intervals
-      n = 8000
-
-c     machine pi
-      pi = dacos(dble(-1.))
 
       starttime = timenowhigh()
 
@@ -88,6 +89,11 @@ c     width of slices
       h = (b - a) / dble(n)
 c     number of slices per processor (rounded up)
       local_n = (n + p - 1) / p
+
+      if (mod(local_n, 2).ne.0) then
+        print*, 'number of slices must be even, exiting!'
+        return
+      endif
 
       local_a = a + dble(rank) * dble(local_n) * h
 c     last processor has less work to do
