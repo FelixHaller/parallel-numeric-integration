@@ -24,7 +24,7 @@ c     machine pi
 
 c     number of intervals
       n = 8000
-
+      
 c     get information about processes
       rank = myprocid()
       p = nprocs()
@@ -71,7 +71,9 @@ c     recieve and sum up all portions on first process
         print*, 'n=', n
         print*, 'p=', p
         print*, 'refernce pi=', pi
-        print*, 'calculated pi (f', f, ')=', calculated
+c        print*, 'calculated pi (f', f, ')=', calculated
+        write(*, 900) 'calculated pi (f', f, ')=', calculated
+900     format (X1 A I1 A x2 F17.15)
         print*, 'difference=', dabs(pi - calculated)
         print*, 'execution time=', duration / 10e6, ' s'
       endif
@@ -92,6 +94,7 @@ c     number of slices per processor (rounded up)
 
       if (mod(local_n, 2).ne.0) then
         print*, 'number of slices must be even, exiting!'
+        stop 'end of run'
         return
       endif
 
