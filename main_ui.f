@@ -1,14 +1,4 @@
       program main
-
-c     int(x * sin(x), 0, pi)
-      call execute(1)
-
-c     int(4 / (1 + x^2), 0, 1)
-      call execute(2)
-
-      end
-
-      subroutine execute(f)
 c     intrinsic functions
       double precision dabs, dacos, dble
       integer timenowhigh, timediff, addnewlink, newtop
@@ -19,12 +9,6 @@ c     variables
 c     functions
       double precision integrate
 
-c     machine pi
-      pi = dacos(dble(-1.))
-
-c     number of intervals
-      n = 200000
-      
 c     get information about processes
       rank = myprocid()
       p = nprocs()
@@ -38,6 +22,31 @@ c     create star topology
           enddo
         else
           link1 = addnewlink(topid, 0, 1)
+        endif
+      endif
+
+c     machine pi
+      pi = dacos(dble(-1.))
+
+      if (rank.eq.0) then
+        print*, 'Please choose the function'
+        print*, ' 1 -->  x * sin(x)'
+        print*, ' 2 -->  4 / (1 + x^2)'
+        read(5,*) f
+        print*, 'Please enter the number of intervalls'
+        read(5,*) n
+      endif
+
+c     send n and f to all processes
+      if (p.gt.1) then
+        if (rank.eq.0) then
+          do i = 1, p-1
+            call send(topid, link(i), f, 4)
+            call send(topid, link(i), n, 4)
+          enddo
+        else
+          call recv(topid, link1, f, 4)
+          call recv(topid, link1, n, 4)
         endif
       endif
 
